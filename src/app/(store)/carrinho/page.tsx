@@ -1,6 +1,7 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { CartContent } from '@/components/store/cart-content'
-import { redirect } from 'next/navigation'
+import { ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 
 export default async function CartPage() {
   const supabase = await createServerSupabaseClient()
@@ -19,8 +20,8 @@ export default async function CartPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Carrinho</h1>
+    <div className="max-w-5xl mx-auto px-6 py-10">
+      <h1 className="text-3xl font-bold tracking-tight mb-8">Carrinho</h1>
       <CartContent cart={cart} />
     </div>
   )

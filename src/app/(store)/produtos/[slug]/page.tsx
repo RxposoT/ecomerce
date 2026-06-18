@@ -4,7 +4,7 @@ import { formatPrice } from '@/lib/stripe/client'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { AddToCartButton } from '@/components/store/add-to-cart-button'
-import { Star } from 'lucide-react'
+import { Star, Package, Truck, ShieldCheck } from 'lucide-react'
 
 export default async function ProductPage({
   params,
@@ -37,9 +37,9 @@ export default async function ProductPage({
     : 0
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-        <div className="aspect-square bg-muted rounded-xl overflow-hidden flex items-center justify-center">
+    <div className="max-w-7xl mx-auto px-6 py-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16">
+        <div className="aspect-square bg-muted/30 rounded-2xl overflow-hidden flex items-center justify-center border border-border/50">
           {p.product_images?.[0] ? (
             <img
               src={p.product_images[0].url}
@@ -47,55 +47,80 @@ export default async function ProductPage({
               className="object-cover w-full h-full"
             />
           ) : (
-            <span className="text-muted-foreground">Sem imagem</span>
+            <div className="flex flex-col items-center gap-3 text-muted-foreground">
+              <Package className="size-12 opacity-30" />
+              <span className="text-sm">Sem imagem</span>
+            </div>
           )}
         </div>
 
-        <div>
+        <div className="flex flex-col">
           {p.categories && (
-            <p className="text-sm text-muted-foreground mb-2">{p.categories.name}</p>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-3">
+              {p.categories.name}
+            </p>
           )}
-          <h1 className="text-3xl font-bold mb-2">{p.name}</h1>
+          <h1 className="text-3xl font-bold tracking-tight mb-3">{p.name}</h1>
 
           {reviews && reviews.length > 0 && (
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-5">
               <div className="flex items-center">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
                     key={i}
-                    className={`size-4 ${i < Math.round(avgRating) ? 'fill-yellow-400 text-yellow-400' : 'text-muted'}`}
+                    className={`size-4 ${i < Math.round(avgRating) ? 'fill-amber-400 text-amber-400' : 'text-muted'}`}
                   />
                 ))}
               </div>
-              <span className="text-sm text-muted-foreground">({reviews.length})</span>
+              <span className="text-sm text-muted-foreground">{avgRating.toFixed(1)} ({reviews.length} avaliações)</span>
             </div>
           )}
 
           <div className="flex items-baseline gap-3 mb-6">
-            <span className="text-3xl font-bold">{formatPrice(p.price)}</span>
+            <span className="text-3xl font-bold tracking-tight">{formatPrice(p.price)}</span>
             {p.compare_price && (
               <span className="text-lg text-muted-foreground line-through">
                 {formatPrice(p.compare_price)}
               </span>
             )}
+            {p.compare_price && (
+              <Badge variant="secondary" className="text-xs">
+                -{Math.round((1 - p.price / p.compare_price) * 100)}%
+              </Badge>
+            )}
           </div>
 
           <div className="mb-6">
             {p.stock_quantity > 0 ? (
-              <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">
-                Em Stock
+              <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50/50 rounded-full px-3">
+                Em Stock — {p.stock_quantity} unidades
               </Badge>
             ) : (
-              <Badge variant="outline" className="text-destructive border-destructive/20 bg-destructive/10">
+              <Badge variant="outline" className="text-destructive border-destructive/20 bg-destructive/10 rounded-full px-3">
                 Esgotado
               </Badge>
             )}
           </div>
 
+          <div className="grid grid-cols-3 gap-3 mb-8">
+            {[
+              { icon: Truck, label: 'Envio 24h' },
+              { icon: ShieldCheck, label: 'Pagamento Seguro' },
+              { icon: Package, label: 'Devolução Grátis' },
+            ].map((item) => {
+              const Icon = item.icon
+              return (
+                <div key={item.label} className="text-center p-3 rounded-xl bg-muted/20 border border-border/50">
+                  <Icon className="size-4 text-primary mx-auto mb-1" />
+                  <span className="text-[10px] text-muted-foreground font-medium">{item.label}</span>
+                </div>
+              )
+            })}
+          </div>
+
           {p.description && (
             <>
-              <p className="text-muted-foreground mb-6 leading-relaxed">{p.description}</p>
-              <Separator className="mb-6" />
+              <p className="text-muted-foreground leading-relaxed mb-8">{p.description}</p>
             </>
           )}
 
@@ -104,30 +129,45 @@ export default async function ProductPage({
               <p className="text-sm font-medium mb-3">Variantes:</p>
               <div className="flex flex-wrap gap-2">
                 {p.product_variants.filter((v: any) => v.is_active).map((variant: any) => (
-                  <Badge key={variant.id} variant="outline" className="cursor-pointer hover:bg-muted">
+                  <Badge key={variant.id} variant="outline" className="cursor-pointer hover:bg-muted rounded-full px-3 py-1.5">
                     {variant.name}
-                    {variant.price_adjustment > 0 && ` (+${formatPrice(variant.price_adjustment)})`}
                   </Badge>
                 ))}
               </div>
             </div>
           )}
 
-          <AddToCartButton productId={p.id} disabled={p.stock_quantity <= 0} />
+          <div className="mt-auto pt-6 border-t border-border/50">
+            <AddToCartButton productId={p.id} disabled={p.stock_quantity <= 0} />
+          </div>
         </div>
       </div>
 
       {reviews && reviews.length > 0 && (
-        <section className="mt-16">
-          <h2 className="text-2xl font-bold mb-6">Avaliações</h2>
-          <div className="space-y-4 max-w-2xl">
+        <section className="mt-20">
+          <Separator className="mb-10" />
+          <div className="flex items-center gap-6 mb-10">
+            <h2 className="text-2xl font-bold tracking-tight">Avaliações</h2>
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`size-5 ${i < Math.round(avgRating) ? 'fill-amber-400 text-amber-400' : 'text-muted'}`}
+                  />
+                ))}
+              </div>
+              <span className="text-sm text-muted-foreground font-medium">{avgRating.toFixed(1)}</span>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl">
             {reviews.map((review: any) => (
-              <div key={review.id} className="border border-border rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
+              <div key={review.id} className="border border-border/50 rounded-2xl p-5 hover:border-border transition-colors">
+                <div className="flex items-center gap-1 mb-3">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star
                       key={i}
-                      className={`size-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted'}`}
+                      className={`size-3.5 ${i < review.rating ? 'fill-amber-400 text-amber-400' : 'text-muted'}`}
                     />
                   ))}
                 </div>
@@ -135,7 +175,7 @@ export default async function ProductPage({
                   <h3 className="font-medium text-sm mb-1">{review.title}</h3>
                 )}
                 {review.comment && (
-                  <p className="text-sm text-muted-foreground">{review.comment}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{review.comment}</p>
                 )}
               </div>
             ))}
