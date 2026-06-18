@@ -32,7 +32,7 @@ export function Header() {
     <header className="border-b border-border bg-background sticky top-0 z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 h-16">
         <Link href="/" className="text-xl font-bold tracking-tight">
-          WaveStore
+          Sacola
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">

@@ -26,7 +26,7 @@ export default async function HomePage() {
       <section className="bg-gradient-to-b from-primary/5 to-background py-24">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
-            Bem-vindo à WaveStore
+            Bem-vindo à Sacola
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
             Descubra os melhores produtos com os melhores preços. Envio rápido para todo o país.

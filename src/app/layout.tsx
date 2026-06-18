@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "WaveStore",
-  description: "A sua loja online de confiança",
+  title: "Sacola",
+  description: "Compras simples, vida simples. O teu e-commerce de confiança.",
 };
 
 export default function RootLayout({

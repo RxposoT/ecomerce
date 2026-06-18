@@ -52,7 +52,7 @@ export function AuthForm() {
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold">{isLogin ? 'Entrar' : 'Criar Conta'}</h1>
         <p className="text-sm text-muted-foreground mt-2">
-          {isLogin ? 'Aceda à sua conta WaveStore' : 'Registe-se para começar a comprar'}
+          {isLogin ? 'Aceda à sua conta Sacola' : 'Registe-se para começar a comprar'}
         </p>
       </div>
 

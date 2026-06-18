@@ -1,36 +1,108 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<p align="center">
+  <h1 align="center">Sacola</h1>
+  <p align="center"><strong>Compras simples, vida simples.</strong></p>
+  <p align="center">Um e-commerce português moderno, rápido e de confiança.</p>
+</p>
 
-## Getting Started
+<br>
 
-First, run the development server:
+## O problema
+
+Comprar online em Portugal implica escolher entre grandes marketplaces internacionais — impessoais e sem alma — ou lojas locais sem presença digital. A Sacola nasceu para preencher esse vazio.
+
+## A solução
+
+Uma plataforma de e-commerce moderna construída do zero com:
+
+- **Next.js 16** — performance, SEO, React Server Components
+- **Supabase** — base de dados PostgreSQL, autenticação, RLS
+- **Stripe** — pagamentos seguros
+- **Tailwind CSS v4 + shadcn/ui** — design system limpo e responsivo
+
+## Funcionalidades
+
+### Loja Pública
+- Página inicial com produtos em destaque e categorias
+- Listagem de produtos com filtro por categoria
+- Página de detalhe do produto (imagens, variantes, preço)
+- Pesquisa rápida (cmd/ctrl+k)
+- Carrinho de compras persistente
+- Checkout com Stripe
+
+### Autenticação e Conta
+- Registo e login (email + password)
+- Perfil do utilizador
+- Histórico de encomendas com detalhes
+- Gestão de moradas de envio
+- Notificações (toast)
+
+### Painel de Administração
+- Dashboard com estatísticas (encomendas, receita, stock baixo)
+- Gestão de produtos (CRUD com formulário completo)
+- Gestão de categorias (hierárquicas)
+- Gestão de encomendas (estados, histórico)
+- Lista de clientes
+
+### Segurança
+- Row Level Security (RLS) no Supabase
+- Função `is_admin()` com SECURITY DEFINER
+- Webhooks Stripe assinados
+- Admin client com service_role key para operações internas
+
+## Começar
+
+### Pré-requisitos
+
+- Node.js 18+
+- Uma conta [Supabase](https://supabase.com)
+- Uma conta [Stripe](https://stripe.com)
+
+### Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# clonar
+git clone https://github.com/RxposoT/ecomerce.git
+cd ecomerce
+
+# instalar dependências
+npm install
+
+# configurar variáveis de ambiente
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Preenche `.env.local` com as tuas chaves (ver [env.example](.env.example)).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# correr em desenvolvimento
+npm run dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# build de produção
+npm run build
+npm run start
+```
 
-## Learn More
+### Base de Dados
 
-To learn more about Next.js, take a look at the following resources:
+As migrations SQL estão em `supabase/migrations/`. Executar no SQL Editor do Supabase por ordem:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. `001_schema.sql` — tabelas, índices, triggers
+2. `002_rls.sql` — políticas RLS
+3. `003_fix_rls_recursion.sql` — correção de recursão
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Tornar um utilizador admin
 
-## Deploy on Vercel
+```sql
+UPDATE profiles SET is_admin = true WHERE id = '<auth-user-id>';
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Stack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Camada | Tecnologia |
+|---|---|
+| Framework | Next.js 16.2.9 (Turbopack) |
+| UI | Tailwind CSS v4 + shadcn/ui + @base-ui/react |
+| Base de Dados | Supabase (PostgreSQL) |
+| Autenticação | Supabase Auth |
+| Pagamentos | Stripe |
+| Deployment | Vercel (recomendado) |
