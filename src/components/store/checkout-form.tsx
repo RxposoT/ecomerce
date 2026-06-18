@@ -10,14 +10,12 @@ import { Separator } from '@/components/ui/separator'
 import { formatPrice } from '@/lib/stripe/client'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
-import type { CartWithItems, Database } from '@/types/database'
-
-type Address = Database['public']['Tables']['addresses']['Row']
+import type { CartWithItems } from '@/types/database'
 
 interface CheckoutFormProps {
   cart: CartWithItems
   subtotal: number
-  addresses: Address[]
+  addresses: any[]
 }
 
 export function CheckoutForm({ cart, subtotal, addresses }: CheckoutFormProps) {

@@ -2,7 +2,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { formatPrice } from '@/lib/stripe/client'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
-import { Package } from 'lucide-react'
+import { Package, Clock, ChevronRight } from 'lucide-react'
 
 const statusLabels: Record<string, string> = {
   pending: 'Pendente',
@@ -11,15 +11,6 @@ const statusLabels: Record<string, string> = {
   shipped: 'Enviada',
   delivered: 'Entregue',
   cancelled: 'Cancelada',
-}
-
-const statusColors: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  confirmed: 'bg-blue-100 text-blue-800 border-blue-200',
-  processing: 'bg-purple-100 text-purple-800 border-purple-200',
-  shipped: 'bg-indigo-100 text-indigo-800 border-indigo-200',
-  delivered: 'bg-green-100 text-green-800 border-green-200',
-  cancelled: 'bg-red-100 text-red-800 border-red-200',
 }
 
 export default async function OrdersPage() {
@@ -35,10 +26,20 @@ export default async function OrdersPage() {
   if (!orders || orders.length === 0) {
     return (
       <div>
-        <h2 className="text-lg font-semibold mb-6">As minhas Encomendas</h2>
-        <div className="text-center py-12 border border-border rounded-xl">
-          <Package className="size-8 mx-auto text-muted-foreground mb-3" />
-          <p className="text-muted-foreground">Nenhuma encomenda encontrada.</p>
+        <h2 className="text-xl font-bold tracking-tight mb-6">As minhas Encomendas</h2>
+        <div className="text-center py-16 bg-card border border-border/30 rounded-2xl">
+          <div className="size-16 rounded-2xl bg-muted/30 flex items-center justify-center mx-auto mb-4">
+            <Package className="size-6 text-muted-foreground/50" />
+          </div>
+          <h3 className="font-semibold mb-1">Nenhuma encomenda</h3>
+          <p className="text-sm text-muted-foreground mb-6">Ainda não fizeste nenhuma encomenda.</p>
+          <Link
+            href="/produtos"
+            className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+          >
+            Explorar produtos
+            <ChevronRight className="size-4" />
+          </Link>
         </div>
       </div>
     )
@@ -46,34 +47,62 @@ export default async function OrdersPage() {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-6">As minhas Encomendas</h2>
-      <div className="space-y-4">
+      <h2 className="text-xl font-bold tracking-tight mb-6">
+        As minhas Encomendas
+        <span className="text-sm font-normal text-muted-foreground ml-2">({orders.length})</span>
+      </h2>
+
+      <div className="space-y-3">
         {orders.map((order) => (
           <Link
             key={order.id}
             href={`/conta/encomendas/${order.id}`}
-            className="block border border-border rounded-xl p-4 hover:bg-muted/50 transition-colors"
+            className="group block bg-card border border-border/30 rounded-2xl p-5 hover:border-border/60 hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)] transition-all"
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="font-medium text-sm">{order.order_number}</span>
-              <Badge
-                variant="outline"
-                className={statusColors[order.status] || ''}
-              >
-                {statusLabels[order.status] || order.status}
-              </Badge>
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <div className="size-10 rounded-xl bg-primary/5 flex items-center justify-center text-xs font-mono font-bold text-primary">
+                  #{order.order_number?.slice(-4)}
+                </div>
+                <div>
+                  <p className="font-semibold text-sm">{order.order_number}</p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <Clock className="size-3 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(order.created_at).toLocaleDateString('pt-PT', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-bold">{formatPrice(order.total)}</p>
+              </div>
             </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">
-                {new Date(order.created_at).toLocaleDateString('pt-PT')}
-              </span>
-              <span className="font-semibold">{formatPrice(order.total)}</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant="outline"
+                  className={`text-xs rounded-full px-2.5 ${
+                    order.status === 'delivered' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' :
+                    order.status === 'cancelled' ? 'border-red-200 bg-red-50 text-red-700' :
+                    order.status === 'shipped' ? 'border-blue-200 bg-blue-50 text-blue-700' :
+                    'border-amber-200 bg-amber-50 text-amber-700'
+                  }`}
+                >
+                  {statusLabels[order.status] || order.status}
+                </Badge>
+                {order.order_items && (
+                  <span className="text-xs text-muted-foreground">
+                    {order.order_items.length} artigo{order.order_items.length !== 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+              <ChevronRight className="size-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            {order.order_items && (
-              <p className="text-xs text-muted-foreground mt-2">
-                {order.order_items.length} artigo{order.order_items.length !== 1 ? 's' : ''}
-              </p>
-            )}
           </Link>
         ))}
       </div>
