@@ -202,30 +202,30 @@ create table if not exists public.abandoned_carts (
 -- ============================================================
 -- INDEXES
 -- ============================================================
-create index idx_products_slug on public.products(slug);
-create index idx_products_category on public.products(category_id);
-create index idx_products_active on public.products(is_active) where is_active = true;
-create index idx_products_featured on public.products(is_featured) where is_featured = true;
-create index idx_products_stock_low on public.products(stock_quantity) where stock_quantity <= min_stock_threshold;
-create index idx_categories_slug on public.categories(slug);
-create index idx_categories_parent on public.categories(parent_id);
-create index idx_cart_items_cart on public.cart_items(cart_id);
-create index idx_orders_user on public.orders(user_id);
-create index idx_orders_status on public.orders(status);
-create index idx_orders_payment on public.orders(payment_status);
-create index idx_orders_created on public.orders(created_at desc);
-create index idx_order_items_order on public.order_items(order_id);
-create index idx_order_status_history_order on public.order_status_history(order_id);
-create index idx_reviews_product on public.reviews(product_id);
-create index idx_product_images_product on public.product_images(product_id);
-create index idx_product_variants_product on public.product_variants(product_id);
-create index idx_product_views_product on public.product_views(product_id);
-create index idx_product_views_viewed on public.product_views(viewed_at desc);
-create index idx_abandoned_carts_cart on public.abandoned_carts(cart_id);
-create index idx_addresses_user on public.addresses(user_id);
-create index idx_profiles_created on public.profiles(created_at desc);
-create index idx_orders_user_created on public.orders(user_id, created_at desc);
-create index idx_order_status_history_created on public.order_status_history(created_at desc);
+create index if not exists idx_products_slug on public.products(slug);
+create index if not exists idx_products_category on public.products(category_id);
+create index if not exists idx_products_active on public.products(is_active) where is_active = true;
+create index if not exists idx_products_featured on public.products(is_featured) where is_featured = true;
+
+create index if not exists idx_categories_slug on public.categories(slug);
+create index if not exists idx_categories_parent on public.categories(parent_id);
+create index if not exists idx_cart_items_cart on public.cart_items(cart_id);
+create index if not exists idx_orders_user on public.orders(user_id);
+create index if not exists idx_orders_status on public.orders(status);
+create index if not exists idx_orders_payment on public.orders(payment_status);
+create index if not exists idx_orders_created on public.orders(created_at desc);
+create index if not exists idx_order_items_order on public.order_items(order_id);
+create index if not exists idx_order_status_history_order on public.order_status_history(order_id);
+create index if not exists idx_reviews_product on public.reviews(product_id);
+create index if not exists idx_product_images_product on public.product_images(product_id);
+create index if not exists idx_product_variants_product on public.product_variants(product_id);
+create index if not exists idx_product_views_product on public.product_views(product_id);
+create index if not exists idx_product_views_viewed on public.product_views(viewed_at desc);
+create index if not exists idx_abandoned_carts_cart on public.abandoned_carts(cart_id);
+create index if not exists idx_addresses_user on public.addresses(user_id);
+create index if not exists idx_profiles_created on public.profiles(created_at desc);
+create index if not exists idx_orders_user_created on public.orders(user_id, created_at desc);
+create index if not exists idx_order_status_history_created on public.order_status_history(created_at desc);
 
 -- ============================================================
 -- TRIGGER FUNCTIONS
@@ -262,34 +262,42 @@ $$ language plpgsql;
 -- ============================================================
 -- TRIGGERS
 -- ============================================================
+drop trigger if exists handle_updated_at_profiles on public.profiles;
 create trigger handle_updated_at_profiles
   before update on public.profiles
   for each row execute function public.handle_updated_at();
 
+drop trigger if exists handle_updated_at_products on public.products;
 create trigger handle_updated_at_products
   before update on public.products
   for each row execute function public.handle_updated_at();
 
+drop trigger if exists handle_updated_at_categories on public.categories;
 create trigger handle_updated_at_categories
   before update on public.categories
   for each row execute function public.handle_updated_at();
 
+drop trigger if exists handle_updated_at_product_variants on public.product_variants;
 create trigger handle_updated_at_product_variants
   before update on public.product_variants
   for each row execute function public.handle_updated_at();
 
+drop trigger if exists handle_updated_at_carts on public.carts;
 create trigger handle_updated_at_carts
   before update on public.carts
   for each row execute function public.handle_updated_at();
 
+drop trigger if exists handle_updated_at_orders on public.orders;
 create trigger handle_updated_at_orders
   before update on public.orders
   for each row execute function public.handle_updated_at();
 
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
+drop trigger if exists on_order_created on public.orders;
 create trigger on_order_created
   before insert on public.orders
   for each row execute function public.create_order_number();
@@ -306,6 +314,7 @@ begin
 end;
 $$ language plpgsql;
 
+drop trigger if exists on_order_status_change on public.orders;
 create trigger on_order_status_change
   after insert or update of status on public.orders
   for each row execute function public.handle_order_status_change();
@@ -327,6 +336,7 @@ begin
 end;
 $$ language plpgsql security definer;
 
+drop trigger if exists on_order_paid on public.orders;
 create trigger on_order_paid
   after update of payment_status on public.orders
   for each row
@@ -342,52 +352,61 @@ alter table public.categories enable row level security;
 alter table public.products enable row level security;
 alter table public.product_images enable row level security;
 alter table public.product_variants enable row level security;
-alter table public.carts enable row level security;
-alter table public.cart_items enable row level security;
-alter table public.orders enable row level security;
-alter table public.order_items enable row level security;
-alter table public.order_status_history enable row level security;
-alter table public.reviews enable row level security;
-alter table public.product_views enable row level security;
-alter table public.abandoned_carts enable row level security;
+alter table if exists public.carts enable row level security;
+alter table if exists public.cart_items enable row level security;
+alter table if exists public.orders enable row level security;
+alter table if exists public.order_items enable row level security;
+alter table if exists public.order_status_history enable row level security;
+alter table if exists public.reviews enable row level security;
+alter table if exists public.product_views enable row level security;
+alter table if exists public.abandoned_carts enable row level security;
 
 -- Profiles: users can read/update own profile; admin can read all
+drop policy if exists "Users can view own profile" on public.profiles;
 create policy "Users can view own profile"
   on public.profiles for select
   using (auth.uid() = id);
 
+drop policy if exists "Users can update own profile" on public.profiles;
 create policy "Users can update own profile"
   on public.profiles for update
   using (auth.uid() = id);
 
 -- Addresses: users can CRUD own addresses
+drop policy if exists "Users manage own addresses" on public.addresses;
 create policy "Users manage own addresses"
   on public.addresses for all
   using (auth.uid() = user_id);
 
 -- Categories: public read, admin write
+drop policy if exists "Public read categories" on public.categories;
 create policy "Public read categories"
   on public.categories for select
   using (is_active = true);
 
 -- Products: public read active, admin write
+drop policy if exists "Public read active products" on public.products;
 create policy "Public read active products"
   on public.products for select
   using (is_active = true);
 
+drop policy if exists "Public read product images" on public.product_images;
 create policy "Public read product images"
   on public.product_images for select
   using (true);
 
+drop policy if exists "Public read product variants" on public.product_variants;
 create policy "Public read product variants"
   on public.product_variants for select
   using (is_active = true);
 
 -- Carts: users own cart
+drop policy if exists "Users manage own cart" on public.carts;
 create policy "Users manage own cart"
   on public.carts for all
   using (auth.uid() = user_id);
 
+drop policy if exists "Users manage own cart items" on public.cart_items;
 create policy "Users manage own cart items"
   on public.cart_items for all
   using (
@@ -397,10 +416,12 @@ create policy "Users manage own cart items"
   );
 
 -- Orders: users view own orders
+drop policy if exists "Users view own orders" on public.orders;
 create policy "Users view own orders"
   on public.orders for select
   using (auth.uid() = user_id);
 
+drop policy if exists "Users view own order items" on public.order_items;
 create policy "Users view own order items"
   on public.order_items for select
   using (
@@ -409,6 +430,7 @@ create policy "Users view own order items"
     )
   );
 
+drop policy if exists "Users view own order history" on public.order_status_history;
 create policy "Users view own order history"
   on public.order_status_history for select
   using (
@@ -418,15 +440,18 @@ create policy "Users view own order history"
   );
 
 -- Reviews: public read approved, authenticated create
+drop policy if exists "Public read approved reviews" on public.reviews;
 create policy "Public read approved reviews"
   on public.reviews for select
   using (is_approved = true);
 
+drop policy if exists "Authenticated create reviews" on public.reviews;
 create policy "Authenticated create reviews"
   on public.reviews for insert
   with check (auth.uid() = user_id);
 
 -- Product views: insert for analytics
+drop policy if exists "Insert product views" on public.product_views;
 create policy "Insert product views"
   on public.product_views for insert
   with check (true);
@@ -446,39 +471,48 @@ end;
 $$ language plpgsql stable;
 
 -- Admin override policies: if user is admin, they can see/do everything
+drop policy if exists "Admin can read all products" on public.products;
 create policy "Admin can read all products"
   on public.products for select
   using (is_admin());
 
+drop policy if exists "Admin can write products" on public.products;
 create policy "Admin can write products"
   on public.products for insert
   with check (is_admin());
 
+drop policy if exists "Admin can update products" on public.products;
 create policy "Admin can update products"
   on public.products for update
   using (is_admin());
 
+drop policy if exists "Admin can delete products" on public.products;
 create policy "Admin can delete products"
   on public.products for delete
   using (is_admin());
 
 -- Repeat for categories, orders, etc. (simplified: admin policies on main tables)
+drop policy if exists "Admin full access categories" on public.categories;
 create policy "Admin full access categories"
   on public.categories for all
   using (is_admin());
 
+drop policy if exists "Admin full access orders" on public.orders;
 create policy "Admin full access orders"
   on public.orders for all
   using (is_admin());
 
+drop policy if exists "Admin full access order items" on public.order_items;
 create policy "Admin full access order items"
   on public.order_items for all
   using (is_admin());
 
+drop policy if exists "Admin full access reviews" on public.reviews;
 create policy "Admin full access reviews"
   on public.reviews for all
   using (is_admin());
 
+drop policy if exists "Admin full access profiles" on public.profiles;
 create policy "Admin full access profiles"
   on public.profiles for select
   using (is_admin());
