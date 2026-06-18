@@ -29,7 +29,7 @@ export function Header() {
 
   return (
     <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 h-16">
+      <div className="max-w-[90rem] mx-auto flex items-center justify-between px-6 h-16">
         <Link href="/" className="flex items-center gap-2.5">
           <div className="size-8 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
             S
