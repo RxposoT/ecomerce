@@ -14,9 +14,13 @@ import {
 } from '@/components/ui/command'
 import { createClient } from '@/lib/supabase/client'
 import { formatPrice } from '@/lib/stripe/client'
-import type { Database } from '@/types/database'
-
-type Product = Database['public']['Tables']['products']['Row']
+type Product = {
+  id: string
+  name: string
+  slug: string
+  price: number
+  is_active: boolean
+}
 
 export function SearchCommand() {
   const router = useRouter()
