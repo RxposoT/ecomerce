@@ -2,17 +2,8 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ShoppingCart, User, LogOut, Package, LayoutDashboard, Sun, Moon, Search } from 'lucide-react'
+import { ShoppingCart, User, LogOut, Sun, Moon, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { createClient } from '@/lib/supabase/client'
 import { getCartItemCount } from '@/lib/cart'
 import { useEffect, useState } from 'react'
@@ -26,6 +17,7 @@ export function Header() {
   const [mounted, setMounted] = useState(false)
   const [cartCount, setCartCount] = useState(0)
   const [user, setUser] = useState<{ email?: string | null; id: string } | null>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -72,7 +64,7 @@ export function Header() {
             <Link href="/carrinho" aria-label="Carrinho">
               <ShoppingCart className="size-[18px]" />
               {cartCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[10px] size-[18px] rounded-full flex items-center justify-center font-medium animate-in zoom-in-150 duration-300">
+                <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[10px] size-[18px] rounded-full flex items-center justify-center font-medium">
                   {cartCount}
                 </span>
               )}
@@ -80,32 +72,50 @@ export function Header() {
           </Button>
 
           {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-                  <User className="size-[18px]" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel>A minha conta</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={() => router.push('/conta')}>
-                    <User className="size-4" />
-                    Perfil
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push('/conta/encomendas')}>
-                    <Package className="size-4" />
-                    Encomendas
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
-                  <LogOut className="size-4" />
-                  Sair
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMenuOpen(!menuOpen)}
+                aria-label="Menu de conta"
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <User className="size-[18px]" />
+              </Button>
+              {menuOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+                  <div className="absolute right-0 top-full mt-1 z-50 w-48 rounded-xl bg-popover p-1.5 text-popover-foreground shadow-lg ring-1 ring-foreground/10">
+                    <p className="px-3 py-1.5 text-xs font-medium text-muted-foreground">A minha conta</p>
+                    <div className="h-px bg-border my-1" />
+                    <Link
+                      href="/conta"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors"
+                    >
+                      <User className="size-4" />
+                      Perfil
+                    </Link>
+                    <Link
+                      href="/conta/encomendas"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors"
+                    >
+                      <Package className="size-4" />
+                      Encomendas
+                    </Link>
+                    <div className="h-px bg-border my-1" />
+                    <button
+                      onClick={() => { setMenuOpen(false); handleSignOut() }}
+                      className="flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg w-full text-left text-destructive hover:bg-destructive/10 transition-colors"
+                    >
+                      <LogOut className="size-4" />
+                      Sair
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           ) : (
             <Button variant="default" size="sm" asChild className="rounded-full px-5">
               <Link href="/auth">Entrar</Link>
