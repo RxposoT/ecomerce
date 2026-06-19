@@ -46,14 +46,11 @@ export function AuthForm() {
   }
 
   return (
-    <div className="w-full max-w-sm">
-      <div className="text-center mb-8">
-        <div className="size-12 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4">
-          <span className="text-primary-foreground font-bold text-lg">S</span>
-        </div>
-        <h1 className="text-2xl font-bold tracking-tight">{isLogin ? 'Entrar' : 'Criar Conta'}</h1>
-        <p className="text-sm text-muted-foreground mt-1.5">
-          {isLogin ? 'Acede à tua conta Sacola' : 'Regista-te para começar a comprar'}
+    <>
+      <div className="text-center mb-6">
+        <h2 className="text-xl font-bold tracking-tight">{isLogin ? 'Entrar' : 'Criar Conta'}</h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          {isLogin ? 'Acede à tua conta' : 'Regista-te para começar a comprar'}
         </p>
       </div>
 
@@ -127,6 +124,6 @@ export function AuthForm() {
           {isLogin ? 'Regista-te' : 'Entra'}
         </button>
       </div>
-    </div>
+    </>
   )
 }
